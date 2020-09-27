@@ -28,8 +28,7 @@ case $TYPE in
                 _flags=$_flags\ -Dvulkan-drivers=amd
                 _flags=$_flags\ -Dgallium-va=true
 
-                sed -i "s/\. output/$_flags \0/" \
-                    $HOME/conf/repos/repo/extra/mesa/build
+                sed -i "s/\. output/$_flags \0/" "$repo_dir/build"
             ;;
         esac
     ;;
@@ -47,11 +46,11 @@ case $TYPE in
 
             log "$PKG" "Build finished in ${_u:-${_s}s}"
         )
-        # Ensure that '$DEST' is set.
+
         : "${DEST:?DEST is unset}"
 
         case $PKG in
-            libudev-zero) # install our helper script
+            libudev-zero)
                 cc contrib/helper.c -o helper
                 install -Dm755 helper "$DEST/usr/bin/helper"
             ;;
@@ -61,8 +60,7 @@ case $TYPE in
                 _flags=$_flags\ -Dvulkan-drivers=amd
                 _flags=$_flags\ -Dgallium-va=true
 
-                sed -i "s/$_flags //" \
-                    $HOME/conf/repos/repo/extra/mesa/build
+                sed -i "s/$_flags //" "$repo_dir/build"
             ;;
 
             *)
