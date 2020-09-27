@@ -1,0 +1,35 @@
+#!/bin/sh -e
+#
+# open file in application based on mime-type
+
+mime_type=$(file -bi)
+
+case $mime_type in
+    audio/*)
+       mpv --no-video "$1"
+    ;;
+
+    video/*)
+        mpv "$1"
+    ;;
+
+    image/*)
+        sxiv "$1"
+    ;;
+
+    text/html*|application/pdf*)
+        firefox "$1"
+    ;;
+
+    application/x-bittorrent*)
+        rtorrent "$1"
+    ;;
+
+    text/*)
+        "${EDITOR:=vi}" "$1"
+    ;;
+
+    *)
+        printf 'unknown mime-type %s\n' "$mime_type"
+    ;;
+esac
