@@ -1,0 +1,106 @@
+#!/bin/sh -e
+
+case $TYPE in
+    pre-extract)
+        case $PKG in
+            firefox|firefox-esr|rust|llvm|clang|gcc)
+                mak_dir=$KISS_TMPDIR/build-$pid
+                pkg_dir=$KISS_TMPDIR/pkg-$pid
+            ;;
+
+            *)
+                log "$PKG" "Activating tmpfs"
+
+                mak_dir=/tmp/build-$pid
+                pkg_dir=/tmp/pkg-$pid
+            ;;
+        esac
+
+        mkdir -p "$mak_dir" "$pkg_dir/$PKG/var/db/kiss/installed"
+    ;;
+
+    pre-build)
+        IFS=. read -r _start _ < /proc/uptime
+
+        case $PKG in
+            mesa)
+                _flags=-Dgallium-drivers=radeonsi
+                _flags=$_flags\ -Dvulkan-drivers=amd
+                _flags=$_flags\ -Dgallium-va=true
+
+                sed -i "s/\. output/$_flags \0/" \
+                    $HOME/conf/repos/repo/extra/mesa/build
+            ;;
+        esac
+    ;;
+
+    post-build)
+        IFS=. read -r _end _ < /proc/uptime
+
+        (
+            _s=$((_end - _start))
+            _h=$((_s / 60 / 60 % 24))
+            _m=$((_s / 60 % 60))
+
+            [ "$_h" = 0 ] || _u="${_u}${_h}h "
+            [ "$_m" = 0 ] || _u="${_u}${_m}m "
+
+            log "$PKG" "Build finished in ${_u:-${_s}s}"
+        )
+        # Ensure that '$DEST' is set.
+        : "${DEST:?DEST is unset}"
+
+        case $PKG in
+            libudev-zero) # install our helper script
+                cc contrib/helper.c -o helper
+                install -Dm755 helper "$DEST/usr/bin/helper"
+            ;;
+
+            mesa)
+                _flags=-Dgallium-drivers=radeonsi
+                _flags=$_flags\ -Dvulkan-drivers=amd
+                _flags=$_flags\ -Dgallium-va=true
+
+                sed -i "s/$_flags //" \
+                    $HOME/conf/repos/repo/extra/mesa/build
+            ;;
+
+            *)
+                if [ "$PKG" != kiss ]; then
+                    rm -rf "$DEST/usr/share/bash-completion"
+                    rm -rf "$DEST/etc/bash_completions.d"
+                    rm -rf "$DEST/usr/lib/charset.alias"
+                    rm -rf "$DEST/usr/share/polkit-1"
+                    rm -rf "$DEST/usr/share/gettext"
+                    rm -rf "$DEST/usr/share/gtk-doc"
+                    rm -rf "$DEST/usr/share/locale"
+                    rm -rf "$DEST/usr/share/info"
+                    rm -rf "$DEST/usr/share/doc"
+                    rm -rf "$DEST/usr/share/man"
+                    rm -rf "$DEST/usr/share/zsh"
+                fi
+            ;;
+        esac
+    ;;
+
+    pre-install)
+        case $PKG in
+            linux)
+                mount /dev/sdb2 /boot/efi
+            ;;
+        esac
+    ;;
+
+    post-install)
+        case $PKG in
+            linux)
+                umount /boot/efi
+            ;;
+
+            sls)
+                chown root:eudaldgr /usr/bin/sls
+                chmod gu+s          /usr/bin/sls
+            ;;
+        esac
+     ;;
+esac
