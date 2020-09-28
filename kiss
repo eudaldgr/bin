@@ -18,6 +18,9 @@ case "$1" in
             kiss r `kiss o | grep -v "${2:-metapkg}" | tr '\n' ' '`
         done
     ;;
+    uu)
+        kiss u && kiss u
+    ;;
     *)
         /usr/bin/kiss "$@"
     ;;
