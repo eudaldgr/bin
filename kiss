@@ -2,15 +2,18 @@
 
 case "$1" in
     bi)
-        kiss b  "${2:-}" && kiss i  "${2:-}"
+        shift 1
+        kiss b  "$@" && kiss i  "$@"
     ;;
 
     cb)
-        kiss c  "${2:-}" && kiss b  "${2:-}"
+        shift 1
+        kiss c  "$@" && kiss b  "$@"
     ;;
 
     cbi)
-        kiss cb "${2:-}" && kiss i  "${2:-}"
+        shift 1
+        kiss cb "$@" && kiss i  "$@"
     ;;
 
     ro)
