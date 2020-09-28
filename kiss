@@ -1,21 +1,25 @@
 #!/bin/sh -e
 
-_kiss=/usr/bin/kiss
-
 case "$1" in
-    cb)
-        "$_kiss" c "${2:-}" && "$_kiss" b "${2:-}"
+    bi)
+        kiss b  "${2:-}" && kiss i  "${2:-}"
     ;;
 
-    bi)
-        "$_kiss" b "${2:-}" && "$_kiss" i "${2:-}"
+    cb)
+        kiss c  "${2:-}" && kiss b  "${2:-}"
     ;;
 
     cbi)
-        "$_kiss" c "${2:-}" && "$_kiss" b "${2:-}" && "$_kiss" i "${2:-}"
+        kiss cb "${2:-}" && kiss i  "${2:-}"
+    ;;
+
+    ro)
+        while kiss o | grep -qv "${2:-metapkg}"; do
+            kiss r `kiss o | grep -v "${2:-metapkg}" | tr '\n' ' '`
+        done
     ;;
 
     *)
-        "$_kiss" "$@"
+        /usr/bin/kiss "$@"
     ;;
 esac
