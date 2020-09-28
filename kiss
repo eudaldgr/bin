@@ -3,25 +3,21 @@
 case "$1" in
     bi)
         shift 1
-        kiss b  "$@" && kiss i  "$@"
+        kiss b "$@" && kiss i "$@"
     ;;
-
     cb)
         shift 1
-        kiss c  "$@" && kiss b  "$@"
+        kiss c "$@" && kiss b "$@"
     ;;
-
     cbi)
         shift 1
-        kiss cb "$@" && kiss i  "$@"
+        kiss c "$@" && kiss b "$@" && kiss i "$@"
     ;;
-
     ro)
         while kiss o | grep -qv "${2:-metapkg}"; do
             kiss r `kiss o | grep -v "${2:-metapkg}" | tr '\n' ' '`
         done
     ;;
-
     *)
         /usr/bin/kiss "$@"
     ;;
