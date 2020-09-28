@@ -3,6 +3,10 @@
 _kiss=/usr/bin/kiss
 
 case "$1" in
+    cb)
+        "$_kiss" c "${2:-}" && "$_kiss" b "${2:-}"
+    ;;
+
     bi)
         "$_kiss" b "${2:-}" && "$_kiss" i "${2:-}"
     ;;
