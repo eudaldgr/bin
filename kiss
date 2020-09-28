@@ -1,0 +1,17 @@
+#!/bin/sh -e
+
+_kiss=/usr/bin/kiss
+
+case "$1" in
+    bi)
+        "$_kiss" b "${2:-}" && "$_kiss" i "${2:-}"
+    ;;
+
+    cbi)
+        "$_kiss" c "${2:-}" && "$_kiss" b "${2:-}" && "$_kiss" i "${2:-}"
+    ;;
+
+    *)
+        "$_kiss" "$@"
+    ;;
+esac
