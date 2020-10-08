@@ -1,7 +1,7 @@
 #!/bin/sh -e
 
 case "$1" in
-    alternatives|build|checksum|download|install|list|remove|search|update|version)
+    alternatives|build|checksum|download|install|list|remove|search|update|version|'')
         /usr/bin/kiss "$@"
     ;;
     ro)
