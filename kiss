@@ -1,27 +1,19 @@
 #!/bin/sh -e
 
 case "$1" in
-    bi)
-        shift 1
-        kiss b "$@" && kiss i "$@"
-    ;;
-    cb)
-        shift 1
-        kiss c "$@" && kiss b "$@"
-    ;;
-    cbi)
-        shift 1
-        kiss c "$@" && kiss b "$@" && kiss i "$@"
+    alternatives|build|checksum|download|install|list|remove|search|update|version)
+        /usr/bin/kiss "$@"
     ;;
     ro)
         while kiss o | grep -qv "${2:-metapkg}"; do
             kiss r `kiss o | grep -v "${2:-metapkg}" | tr '\n' ' '`
         done
     ;;
-    uu)
-        kiss u && kiss u
-    ;;
     *)
-        /usr/bin/kiss "$@"
+        _1="$1"
+        shift 1
+        for _opt in $(echo "$_1" | grep -o .); do
+            /usr/bin/kiss "$_opt" "$@"
+        done
     ;;
 esac
