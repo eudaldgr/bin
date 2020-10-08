@@ -1,7 +1,7 @@
 #!/bin/sh -e
 
 case "$1" in
-    alternatives|build|checksum|download|install|list|remove|search|update|version|'')
+    alternatives|build|checksum|download|install|list|remove|search|update|version|''|help-ext|chroot|depends|export|fork|help|link|maintainer|manifest|new|orphans|outdated|owns|reset|revdepends|size)
         /usr/bin/kiss "$@"
     ;;
     ro)
@@ -12,8 +12,8 @@ case "$1" in
     *)
         _1="$1"
         shift 1
-        for _opt in $(echo "$_1" | grep -o .); do
-            /usr/bin/kiss "$_opt" "$@"
+        for _action in $(echo "$_1" | grep -o .); do
+            /usr/bin/kiss "$_action" "$@"
         done
     ;;
 esac
