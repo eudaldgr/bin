@@ -1,6 +1,6 @@
 #!/bin/sh
 
-trap 'amixer -c 1 -q set Master 60%; hsetroot -fill $HOME/lib/img/wall/wallpaper.jpg; 2bwm' USR1
+trap 'amixer -c 1 -q set Master 60%; hsetroot -fill $HOME/usr/img/wall/wallpaper.jpg; 2bwm' USR1
 
 (
     trap '' USR1
