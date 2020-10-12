@@ -50,6 +50,16 @@ case $TYPE in
         : "${DEST:?DEST is unset}"
 
         case $PKG in
+            alsa-lib)
+                _files="~/etc/asound.conf"
+
+                sed -i "s@~/.asoundrc@$_files|||\0@" "$DEST/usr/share/alsa/alsa.conf"
+            ;;
+
+            kiss)
+                sed -i "s/grub/metapkg/g" "$DEST/usr/bin/kiss-orphans"
+            ;;
+
             libudev-zero)
                 cc contrib/helper.c -o helper
                 install -Dm755 helper "$DEST/usr/bin/helper"
