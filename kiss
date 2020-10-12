@@ -1,10 +1,11 @@
 #!/bin/sh -e
 
 case "$1" in
-    alternatives|build|checksum|download|install|list|remove|search|update|version|''|help-ext|chroot|depends|export|fork|help|link|maintainer|manifest|new|orphans|outdated|owns|reset|revdepends|size)
+    alternatives|build|checksum|download|install|list|remove|search|update|version|''|\
+    help-ext|chroot|depends|export|fork|help|link|maintainer|manifest|new|orphans|outdated|\
+    owns|reset|revdepends|size)
         /usr/bin/kiss "$@"
     ;;
-
     add)
         shift 1
         [ "$#" -ne 0 ] && {
@@ -19,7 +20,6 @@ case "$1" in
             [ "$added" ] && kiss bi metapkg
         }
     ;;
-
     del)
         shift 1
         [ "$#" -ne 0 ] && {
@@ -34,17 +34,14 @@ case "$1" in
             [ "$deleted" ] && kiss bi metapkg && kiss ro
         }
     ;;
-
     live)
         kiss bi grub libisoburn squashfs-tools syslinux
     ;;
-
     ro)
         while kiss o | grep -qv "${2:-metapkg}"; do
             kiss r `kiss o | grep -v "${2:-metapkg}" | tr '\n' ' '`
         done
     ;;
-
     *)
         _1="$1"
         shift 1
