@@ -15,4 +15,5 @@ qemu-system-x86_64 \
     -vga virtio \
     -display sdl,gl=on \
     -boot menu=on \
+    -usb \
     "$@"

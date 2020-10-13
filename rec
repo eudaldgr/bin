@@ -1,0 +1,17 @@
+#!/bin/sh
+
+ffmpeg \
+    -f alsa \
+    -ac 2 \
+    -i loopout \
+    -c:a flac \
+    -f x11grab \
+    -r 60 \
+    -s 1920x1080 \
+    -i :0.0 \
+    -c:v libx264rgb \
+    -preset ultrafast \
+    -pix_fmt yuv444p \
+    -crf 0 \
+    -y \
+    "$1"
