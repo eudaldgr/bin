@@ -1,0 +1,7 @@
+#!/bin/sh
+
+mpv \
+    --no-video \
+    --shuffle \
+    "$@" \
+    -- "$HOME/usr/audio/music/"
