@@ -52,11 +52,7 @@ case "$1" in
         _1="$1"
         shift 1
         for _action in $(echo "$_1" | grep -o .); do
-            [ "$_action" = u ] && {
-                /usr/bin/kiss "$_action"
-            } || {
-                /usr/bin/kiss "$_action" "$@"
-            }
+            /usr/bin/kiss "$_action" "$@"
         done
     ;;
 esac

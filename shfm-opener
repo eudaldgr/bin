@@ -20,7 +20,7 @@ case $1 in
     ;;
 
     *.torrent)
-        rtorrent "$1"
+        rtorrent -n -o import=$HOME/etc/rtorrent.rc "$1"
     ;;
 
     *)
