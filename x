@@ -1,6 +1,6 @@
 #!/bin/sh
 
-trap 'picom -b --config $HOME/etc/picom.conf; hsetroot -cover $HOME/usr/img/wall/namroud-gorguis-FZWivbri0Xk-unsplash.jpg; 2bwm' USR1
+trap 'picom -b --config $HOME/etc/picom.conf; hsetroot -cover $HOME/usr/img/wall/default; 2bwm' USR1
 
 (
     trap '' USR1
