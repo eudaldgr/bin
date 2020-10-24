@@ -23,6 +23,10 @@ case $TYPE in
         IFS=. read -r _start _ < /proc/uptime
 
         case $PKG in
+            busybox)
+                sed -i "s|\.profile|etc/profile|g" shell/ash.c
+            ;;
+
             mesa)
                 _flags=-Dgallium-drivers=radeonsi
                 _flags=$_flags\ -Dvulkan-drivers=amd

@@ -32,7 +32,9 @@ case "$1" in
     live)
         shift 1
         for _pkg in grub libisoburn squashfs-tools syslinux; do
-            [ -d "/var/db/kiss/installed/$_pkg" ] || kiss bi "$_pkg"
+            [ -d "/var/db/kiss/installed/$_pkg" ] || {
+                kiss i "$_pkg" || kiss bi "$_pkg"
+            }
         done
         
         (
