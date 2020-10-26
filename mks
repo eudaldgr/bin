@@ -1,0 +1,8 @@
+#!/bin/sh
+
+[ "$1" ] || exit 1
+
+[ -e "$HOME/bin/$2" ] || {
+    printf '#!/bin/sh\n' > "$HOME/bin/$2" && chmod +x "$HOME/bin/$2"
+    nvim "$HOME/bin/$2"
+}

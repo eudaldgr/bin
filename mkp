@@ -1,0 +1,31 @@
+#!/bin/sh
+
+[ "$1" ] || exit 1
+
+kiss n $2 $3 $4
+
+case "$1" in
+    autotool|a)
+        cp "$HOME/usr/skel/pkg/autotools" "$2/build"
+    ;;
+    cmake|c)
+        cp "$HOME/usr/skel/pkg/cmake"     "$2/build"
+    ;;
+    go|g)
+        cp "$HOME/usr/skel/pkg/go"        "$2/build"
+    ;;
+    make|mk)
+        cp "$HOME/usr/skel/pkg/make"      "$2/build"
+    ;;
+    meson|m)
+        cp "$HOME/usr/skel/pkg/meson"     "$2/build"
+    ;;
+    python|p)
+        cp "$HOME/usr/skel/pkg/python"    "$2/build"
+    ;;
+    rust|r)
+        cp "$HOME/usr/skel/pkg/rust"      "$2/build"
+    ;;
+esac
+
+chmod +x "$2/build"
