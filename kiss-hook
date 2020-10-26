@@ -23,6 +23,12 @@ case $TYPE in
         IFS=. read -r _start _ < /proc/uptime
 
         case $PKG in
+            baselayout)
+                sed -i 's/home //g'                  "$repo_dir/build"
+                sed -i 's/bin i/bin home i/g'        "$repo_dir/build"
+                sed -i '30iln -s usr/home "$1/home"' "$repo_dir/build"
+            ;;
+
             busybox)
                 sed -i "s|\.profile|etc/profile|g" shell/ash.c
             ;;
@@ -58,6 +64,12 @@ case $TYPE in
                 _files="~/etc/asound.conf"
 
                 sed -i "s@~/.asoundrc@$_files|||\0@" "$DEST/usr/share/alsa/alsa.conf"
+            ;;
+
+            baselayout)
+                sed -i 's/home i/i/g'         "$repo_dir/build"
+                sed -i 's/etc m/etc home m/g' "$repo_dir/build"
+                sed -i '/usr\/home/d'         "$repo_dir/build"
             ;;
 
             kiss)
