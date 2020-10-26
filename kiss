@@ -1,6 +1,7 @@
 #!/bin/sh
 
 _deps="$HOME/usr/src/eudald-kiss/metapkg/depends"
+_live="$HOME/usr/src/kiss-live"
 
 case "$1" in
     alternatives|build|checksum|download|install|list|remove|search|update|version|''|help-ext|\
@@ -33,13 +34,7 @@ case "$1" in
             }
         done
         
-        (
-            cd "$HOME/usr/src/kiss-live"
-
-            sls ./kiss-live "$@"
-
-            cd -
-        )
+        ( cd "$_live"; sls ./kiss-live "$@"; cd - )
     ;;
     ro)
         while kiss o | grep -qv "${2:-metapkg}"; do

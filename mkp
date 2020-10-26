@@ -4,7 +4,7 @@
 
 pkg="$HOME/usr/skel/pkg"
 
-kiss n $2 $3 $4
+kiss n "$2" "$3" "$4"
 
 case "$1" in
     autotool|a) cp "$pkg/autotools" "$2/build" ;;
