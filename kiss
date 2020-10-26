@@ -1,32 +1,28 @@
-#!/bin/sh -e
+#!/bin/sh
+
+_deps="$HOME/usr/src/eudald-kiss/metapkg/depends"
 
 case "$1" in
     alternatives|build|checksum|download|install|list|remove|search|update|version|''|help-ext|\
     chroot|depends|export|fork|help|link|maintainer|manifest|new|orphans|outdated|owns|reset|revdepends|size)
         /usr/bin/kiss "$@"
     ;;
-    add)
+    add|del)
+        _1="$1"
         shift 1
         [ "$#" -ne 0 ] && {
             for _pkg in "$@"; do
-                [ $(cat $HOME/usr/src/eudald-kiss/metapkg/depends | grep -w "$_pkg") ] || {
-                    echo "$_pkg" >> $HOME/usr/src/eudald-kiss/metapkg/depends
-                    added=true
-                }
+                if [ -n "$(cat $_deps | grep -w $_pkg)" ]; then
+                    [ "$_1" = del ] && { sed -i "/^$_pkg$/d" "$_deps"; ch=1; }
+                else
+                    [ "$_1" = add ] && { echo "$_pkg" >> "$_deps"; ch=1; }
+                fi
             done
-            [ "$added" ] && kiss bi metapkg
-        }
-    ;;
-    del)
-        shift 1
-        [ "$#" -ne 0 ] && {
-            for _pkg in "$@"; do
-                [ $(cat $HOME/usr/src/eudald-kiss/metapkg/depends | grep -w "$_pkg") ] && {
-                    sed -i "/$_pkg/d" $HOME/usr/src/eudald-kiss/metapkg/depends
-                    deleted=true
-                }
-            done
-            [ "$deleted" ] && { kiss bi metapkg; kiss ro; }
+
+            [ "$ch" = 1 ] && {
+                sort -uk1,1 "$_deps" -o "$_deps"
+                KISS_PROMPT=0 kiss bi metapkg; kiss ro
+            }
         }
     ;;
     live)
@@ -38,7 +34,7 @@ case "$1" in
         done
         
         (
-            cd $HOME/usr/src/kiss-live
+            cd "$HOME/usr/src/kiss-live"
 
             sls ./kiss-live "$@"
 
