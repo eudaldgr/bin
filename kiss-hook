@@ -40,6 +40,10 @@ case $TYPE in
 
                 sed -i "s/\. output/$_flags \0/" "$repo_dir/build"
             ;;
+
+            scroll)
+                sed -i "s|//||g" config.def.h
+            ;;
         esac
     ;;
 
