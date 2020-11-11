@@ -1,6 +1,7 @@
 #!/bin/sh
 
 _deps="$HOME/usr/src/eudald-kiss/metapkg/depends"
+_kern="$HOME/usr/src/eudald-kiss/linux"
 _live="$HOME/usr/src/kiss-live"
 
 case "$1" in
@@ -26,9 +27,34 @@ case "$1" in
             }
         }
     ;;
+    k) # Great with 'u' -> kiss ku
+        r=$(curl -Ss https://www.kernel.org/feeds/kdist.xml) && {
+            remote_ver=${r%%: stable*}
+            remote_ver=${remote_ver##*>}
+        } || {
+            printf 'Kernel network error\n' >&2
+            exit 1
+        }
+        
+        l=$(cat "$_kern/version") && {
+            local_ver=${l% *}
+        } || {
+            printf 'Kernel local version not found\n' >&2
+            exit 1
+        }
+        
+        [ "$local_ver" != "$remote_ver" ] && {
+            sed -i "s/$local_ver/$remote_ver/g" "$_kern/sources"
+            echo "$remote_ver 1" > "$_kern/version"
+
+            ( cd "$_kern"; kiss c >&/dev/null; cd - >&/dev/null )
+        } || {
+            printf 'Kernel is up-to-date\n' >&2
+        }
+    ;;
     live)
         shift 1
-        for _pkg in grub libisoburn squashfs-tools syslinux; do
+        for _pkg in grub libisofs libburn libisoburn squashfs-tools syslinux; do
             [ -d "/var/db/kiss/installed/$_pkg" ] || {
                 kiss i "$_pkg" || kiss bi "$_pkg"
             }
