@@ -112,20 +112,8 @@ case $TYPE in
         esac
     ;;
 
-    pre-install)
-        case $PKG in
-            linux)
-                mount /dev/sdb2 /boot/efi
-            ;;
-        esac
-    ;;
-
     post-install)
         case $PKG in
-            linux)
-                umount /boot/efi
-            ;;
-
             sls)
                 chown root:eudaldgr /usr/bin/sls
                 chmod gu+s          /usr/bin/sls

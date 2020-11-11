@@ -55,7 +55,11 @@ case "$1" in
             sed -i "s/$local_ver/$remote_ver/g" "$_kern/sources"
             echo "$remote_ver 1" > "$_kern/version"
 
+            "$KISS_SU" mount /dev/sdb2 /boot/efi
+
             ( cd "$_kern"; kiss cbi; cd - >&/dev/null )
+
+            "$KISS_SU" umount /boot/efi
         } || {
             printf "$arrow Kernel is up-to-date\n" >&2
         }
