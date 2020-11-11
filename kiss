@@ -1,5 +1,6 @@
 #!/bin/sh
 
+arrow="\033[1;33m->\033[m"
 _deps="$HOME/usr/src/eudald-kiss/metapkg/depends"
 _kern="$HOME/usr/src/eudald-kiss/linux"
 _live="$HOME/usr/src/kiss-live"
@@ -28,29 +29,39 @@ case "$1" in
         }
     ;;
     k) # Great with 'u' -> kiss ku
+        printf "$arrow Updating kernel\n" >&2
+
         r=$(curl -Ss https://www.kernel.org/feeds/kdist.xml) && {
             remote_ver=${r%%: stable*}
             remote_ver=${remote_ver##*>}
         } || {
-            printf 'Kernel network error\n' >&2
+            printf "$arrow Kernel network error\n" >&2
             exit 1
         }
         
         l=$(cat "$_kern/version") && {
             local_ver=${l% *}
         } || {
-            printf 'Kernel local version not found\n' >&2
+            printf "$arrow Kernel local version not found\n" >&2
             exit 1
         }
         
         [ "$local_ver" != "$remote_ver" ] && {
+            printf "$arrow Found new kernel update\n"
+            printf 'linux %s ==> %s\n' "${l// /\-}" "$remote_ver-1"
+            printf "$arrow Apply?: Press Enter to continue or Ctrl+C to abort here\n"
+            [ "$KISS_PROMPT" = 0 ] || read -r _
+
             sed -i "s/$local_ver/$remote_ver/g" "$_kern/sources"
             echo "$remote_ver 1" > "$_kern/version"
 
-            ( cd "$_kern"; kiss c >&/dev/null; cd - >&/dev/null )
+            ( cd "$_kern"; kiss cbi; cd - >&/dev/null )
         } || {
-            printf 'Kernel is up-to-date\n' >&2
+            printf "$arrow Kernel is up-to-date\n" >&2
         }
+    ;;
+    ku)
+        kiss k && kiss u
     ;;
     live)
         shift 1
