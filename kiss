@@ -46,7 +46,7 @@ case "$1" in
             exit 1
         }
         
-        [ "$local_ver" != "$remote_ver" ] && {
+        if [ "$local_ver" != "$remote_ver" ]; then
             printf "$arrow Found new kernel update\n"
             printf 'linux %s ==> %s\n' "${l// /\-}" "$remote_ver-1"
             printf "$arrow Apply?: Press Enter to continue or Ctrl+C to abort here\n"
@@ -56,9 +56,9 @@ case "$1" in
             echo "$remote_ver 1" > "$_kern/version"
 
             ( cd "$_kern"; kiss cbi; cd - >&/dev/null )
-        } || {
+        else
             printf "Already up to date.\n" >&2
-        }
+        fi
     ;;
     ku)
         kiss k && kiss u
