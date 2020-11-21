@@ -7,7 +7,7 @@ _live="$HOME/usr/src/kiss-live"
 
 case "$1" in
     alternatives|build|checksum|download|install|list|remove|search|update|version|''|help-ext|\
-    chroot|depends|export|fork|help|link|maintainer|manifest|new|orphans|outdated|owns|reset|revdepends|size)
+    chroot|depends|export|fork|graph|help|link|maintainer|manifest|new|orphans|outdated|owns|reset|revdepends|size)
         /usr/bin/kiss "$@"
     ;;
     add|del)
@@ -29,20 +29,20 @@ case "$1" in
         }
     ;;
     k|kernel) # Great with 'u' -> kiss ku
-        printf "$arrow Updating kernel\n" >&2
+        printf "$arrow Updating kernel\n"
 
         r=$(curl -Ss https://www.kernel.org/feeds/kdist.xml) && {
             remote_ver=${r%%: stable*}
             remote_ver=${remote_ver##*>}
         } || {
-            printf "$arrow Kernel network error\n" >&2
+            printf "$arrow Kernel network error\n"
             exit 1
         }
         
         l=$(cat "$_kern/version") && {
             local_ver=${l% *}
         } || {
-            printf "$arrow Kernel local version not found\n" >&2
+            printf "$arrow Kernel local version not found\n"
             exit 1
         }
         
@@ -57,7 +57,7 @@ case "$1" in
 
             ( cd "$_kern"; kiss cbi; cd - >&/dev/null )
         else
-            printf "Already up to date.\n" >&2
+            printf "Already up to date.\n"
         fi
     ;;
     ku)
@@ -65,13 +65,13 @@ case "$1" in
     ;;
     live)
         shift 1
-        for _pkg in grub libisofs libburn libisoburn squashfs-tools syslinux; do
+        for _pkg in grub libisoburn syslinux; do
             [ -d "/var/db/kiss/installed/$_pkg" ] || {
                 kiss i "$_pkg" || kiss bi "$_pkg"
             }
         done
         
-        ( cd "$_live"; sls ./kiss-live "$@"; cd - )
+        ( cd "$_live"; sls ./kiss-live "$@"; cd - >&/dev/null )
     ;;
     ro)
         while kiss o | grep -qv "${2:-metapkg}"; do
