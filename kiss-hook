@@ -1,123 +1,171 @@
 #!/bin/sh -e
 
-case $TYPE in
-    pre-extract)
-        case $PKG in
-            firefox|firefox-esr|rust|llvm|clang|gcc)
-                mak_dir=$KISS_TMPDIR/build-$pid
-                pkg_dir=$KISS_TMPDIR/pkg-$pid
-            ;;
+cleanup()
+{
+    rm -rf "$DEST/usr/share/bash-completion" \
+           "$DEST/usr/share/applications" \
+           "$DEST/etc/bash_completion.d" \
+           "$DEST/usr/lib/charset.alias" \
+           "$DEST/usr/share/polkit-1" \
+           "$DEST/usr/share/gettext" \
+           "$DEST/usr/share/gtk-doc" \
+           "$DEST/usr/share/locale" \
+           "$DEST/usr/share/sounds" \
+           "$DEST/usr/share/icons" \
+           "$DEST/usr/share/info" \
+           "$DEST/usr/share/doc" \
+           "$DEST/usr/share/man" \
+           "$DEST/usr/share/zsh"
+}
 
-            *)
-                log "$PKG" "Activating tmpfs"
+# int main()
+{
+    case $TYPE in
+        pre-extract)
+            case $PKG in
+                firefox|firefox-esr|rust|llvm|clang|gcc)
+                    mak_dir=$KISS_TMPDIR/build-$pid
+                    pkg_dir=$KISS_TMPDIR/pkg-$pid
+                ;;
 
-                mak_dir=/tmp/build-$pid
-                pkg_dir=/tmp/pkg-$pid
-            ;;
-        esac
+                *)
+                    log "$PKG" "Activating tmpfs"
 
-        mkdir -p "$mak_dir" "$pkg_dir/$PKG/var/db/kiss/installed"
-    ;;
+                    mak_dir=/tmp/build-$pid
+                    pkg_dir=/tmp/pkg-$pid
+                ;;
+            esac
 
-    pre-build)
-        IFS=. read -r _start _ < /proc/uptime
+            mkdir -p "$mak_dir" "$pkg_dir/$PKG/var/db/kiss/installed"
+        ;;
 
-        case $PKG in
-            baselayout)
-                sed -i 's/home //g'                  "$repo_dir/build"
-                sed -i 's/bin i/bin home i/g'        "$repo_dir/build"
-                sed -i '30iln -s usr/home "$1/home"' "$repo_dir/build"
-            ;;
+        pre-build)
+            IFS=. read -r _start _ < /proc/uptime
 
-            busybox)
-                sed -i "s|\.profile|etc/profile|g" shell/ash.c
-            ;;
+            case $PKG in
+                baselayout)
+                    sed -i 's/home //g'                  "$repo_dir/build"
+                    sed -i 's/bin i/bin home i/g'        "$repo_dir/build"
+                    sed -i '30iln -s usr/home "$1/home"' "$repo_dir/build"
+                ;;
 
-            mesa)
-                _flags=-Dgallium-drivers=radeonsi
-                _flags=$_flags\ -Dvulkan-drivers=amd
-                _flags=$_flags\ -Dgallium-va=true
+                busybox)
+                    sed -i "s|\.profile|etc/profile|g" shell/ash.c
+                    sed -i "s|/home|/usr/home|g"       loginutils/adduser.c
+                ;;
 
-                sed -i "s/\. output/$_flags \0/" "$repo_dir/build"
-            ;;
+                mesa)
+                    _flags=-Dgallium-drivers=radeonsi
+                    _flags=$_flags\ -Dvulkan-drivers=amd
+                    _flags=$_flags\ -Dgallium-va=enabled
 
-            scroll)
-                sed -i "s|//||g" config.def.h
-            ;;
-        esac
-    ;;
+                    sed -i "s/\. output/$_flags \0/" "$repo_dir/build"
+                ;;
 
-    post-build)
-        IFS=. read -r _end _ < /proc/uptime
+                scroll)
+                    sed -i "s|//||g" config.def.h
+                ;;
+            esac
+        ;;
 
-        (
-            _s=$((_end - _start))
-            _h=$((_s / 60 / 60 % 24))
-            _m=$((_s / 60 % 60))
+        post-build)
+            IFS=. read -r _end _ < /proc/uptime
 
-            [ "$_h" = 0 ] || _u="${_u}${_h}h "
-            [ "$_m" = 0 ] || _u="${_u}${_m}m "
+            (
+                _s=$((_end - _start))
+                _h=$((_s / 60 / 60 % 24))
+                _m=$((_s / 60 % 60))
 
-            log "$PKG" "Build finished in ${_u:-${_s}s}"
-        )
+                [ "$_h" = 0 ] || _u="${_u}${_h}h "
+                [ "$_m" = 0 ] || _u="${_u}${_m}m "
 
-        : "${DEST:?DEST is unset}"
+                log "$PKG" "Build finished in ${_u:-${_s}s}"
+            )
 
-        case $PKG in
-            alsa-lib)
-                _files="~/etc/asound.conf"
+            : "${DEST:?DEST is unset}"
 
-                sed -i "s@~/.asoundrc@$_files|||\0@" "$DEST/usr/share/alsa/alsa.conf"
-            ;;
+            case $PKG in
+                abiword)
+                ;;
 
-            baselayout)
-                sed -i 's/home i/i/g'         "$repo_dir/build"
-                sed -i 's/etc m/etc home m/g' "$repo_dir/build"
-                sed -i '/usr\/home/d'         "$repo_dir/build"
-            ;;
+                adwaita-icon-theme)
+                ;;
 
-            kiss)
-                sed -i "s/grub/metapkg/g" "$DEST/usr/bin/kiss-orphans"
-            ;;
+                alsa-lib)
+                    _files="~/etc/asound.conf"
 
-            libudev-zero)
-                cc contrib/helper.c -o helper
-                install -Dm755 helper "$DEST/usr/bin/helper"
-            ;;
+                    sed -i "s@~/.asoundrc@$_files|||\0@" "$DEST/usr/share/alsa/alsa.conf"
 
-            mesa)
-                _flags=-Dgallium-drivers=radeonsi
-                _flags=$_flags\ -Dvulkan-drivers=amd
-                _flags=$_flags\ -Dgallium-va=true
+                    cleanup
+                ;;
 
-                sed -i "s/$_flags //" "$repo_dir/build"
-            ;;
+                baselayout)
+                    sed -i 's/home i/i/g'         "$repo_dir/build"
+                    sed -i 's/etc m/etc home m/g' "$repo_dir/build"
+                    sed -i '/usr\/home/d'         "$repo_dir/build"
+                ;;
 
-            *)
-                rm -rf "$DEST/usr/share/bash-completion"
-                rm -rf "$DEST/usr/share/applications"
-                rm -rf "$DEST/etc/bash_completion.d"
-                rm -rf "$DEST/usr/lib/charset.alias"
-                rm -rf "$DEST/usr/share/polkit-1"
-                rm -rf "$DEST/usr/share/gettext"
-                rm -rf "$DEST/usr/share/gtk-doc"
-                rm -rf "$DEST/usr/share/locale"
-                rm -rf "$DEST/usr/share/sounds"
-                rm -rf "$DEST/usr/share/icons"
-                rm -rf "$DEST/usr/share/info"
-                rm -rf "$DEST/usr/share/doc"
-                rm -rf "$DEST/usr/share/man"
-                rm -rf "$DEST/usr/share/zsh"
-            ;;
-        esac
-    ;;
+                busybox)
+                    {
+                        echo "kvm         root:kvm 660"
+                        echo "SUBSYSTEM=drm;.*   root:video 660 *env > /tmp/.libudev-zero/uevent.\$$"
+                        echo "SUBSYSTEM=input;.* root:input 660 *env > /tmp/.libudev-zero/uevent.\$$"
+                    } >> "$DEST/etc/mdev.conf"
+                ;;
 
-    post-install)
-        case $PKG in
-            sls)
-                chown root:eudaldgr /usr/bin/sls
-                chmod gu+s          /usr/bin/sls
-            ;;
-        esac
-     ;;
-esac
+                gnumeric)
+                ;;
+
+                goffice)
+                ;;
+
+                kiss)
+                    sed -i "s/grub/metapkg/g" "$DEST/usr/bin/kiss-orphans"
+                ;;
+
+                libudev-zero)
+                    cc contrib/helper.c -o helper
+                    install -Dm755 helper "$DEST/usr/bin/helper"
+
+                    cleanup
+                ;;
+
+                mesa)
+                    _flags=-Dgallium-drivers=radeonsi
+                    _flags=$_flags\ -Dvulkan-drivers=amd
+                    _flags=$_flags\ -Dgallium-va=enabled
+
+                    sed -i "s/$_flags //" "$repo_dir/build"
+
+                    cleanup
+                ;;
+
+                *)
+                    cleanup
+                ;;
+            esac
+        ;;
+
+        pre-install)
+            case $PKG in
+                linux)
+                    mount /dev/sdb2 /boot
+                ;;
+            esac
+        ;;
+                
+
+        post-install)
+            case $PKG in
+                linux)
+                    umount /boot
+                ;;
+
+                sls)
+                    chown root:eudaldgr /usr/bin/sls
+                    chmod gu+s          /usr/bin/sls
+                ;;
+            esac
+         ;;
+    esac
+}

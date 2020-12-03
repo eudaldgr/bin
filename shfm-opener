@@ -16,11 +16,15 @@ case $1 in
     ;;
 
     *.html|*.pdf)
-        firefox "$1"
+        $HOME/usr/bin/ff "$1"
     ;;
 
     *.torrent)
         rtorrent -n -o import=$HOME/etc/rtorrent.rc "$1"
+    ;;
+
+    *.doc|*.docx)
+        abiword "$1"
     ;;
 
     *)
